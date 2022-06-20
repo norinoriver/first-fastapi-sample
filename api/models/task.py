@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from api.db import Base
 
 class Task(Base):
-    __tablename__ = "task"
+    __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True)
     title = Column(String(1024))
@@ -14,6 +14,6 @@ class Task(Base):
 class Done(Base):
     __tablename__ = "dones"
 
-    id = Column(Integer, ForeignKey("task.id"), primary_key=True)
+    id = Column(Integer, ForeignKey("tasks.id"), primary_key=True)
 
     task = relationship("Task", back_populates="done")
