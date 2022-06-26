@@ -3,7 +3,7 @@ class DBConfig:
     PASSWORD="test-passwd"
     HOSTNAME="localhost"
     PORT="33306"
-    CHARSET="utf8"
+    CHARSET="utf8mb4"
 
     def __init__(self):
         self.DB_SETTING = "{0}:{1}@{2}:{3}/demo?charset={4}".format(self.USER_NAME, self.PASSWORD, self.HOSTNAME, self.PORT, self.CHARSET)
