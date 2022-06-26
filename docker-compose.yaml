@@ -4,7 +4,7 @@ services:
     image: mysql:8.0
     platform: linux/x86_64  # If you use M1 Mac, settings this parameter
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'  # rootアカウントをパスワードなしで作成
+      MYSQL_ROOT_PASSWORD: 'test-passwd'
       MYSQL_DATABASE: 'demo'  # 初期データベースとしてdemoを設定
       TZ: 'Asia/Tokyo'  # タイムゾーンを日本時間に設定
     volumes:

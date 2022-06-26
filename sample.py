@@ -15,20 +15,27 @@ from typing import List
 # human: Human = CreateHuman()
 # print(human)
 
-def return_result(num: int):
-    return 'even' if num % 2 == 0 else 'odd'
+# def return_result(num: int):
+#     return 'even' if num % 2 == 0 else 'odd'
 
-print(return_result(2))
-print(return_result(1))
+# print(return_result(2))
+# print(return_result(1))
 
-def return_result(num: int):
-    task = None
-    if num % 2 == 0:
-        task = ['value']
-    return task[0] if task is not None else None
+# def return_result(num: int):
+#     task = None
+#     if num % 2 == 0:
+#         task = ['value']
+#     return task[0] if task is not None else None
 
-print(return_result(1))
+# print(return_result(1))
 
-tmp = None
-print(tmp is None)
-print(tmp is not None)
+# tmp = None
+# print(tmp is None)
+# print(tmp is not None)
+
+# from api.config.config import DBConfig
+
+# config = DBConfig()
+# print(config.__str__())
+# print("mysql+pymysql://root:test-passwd@localhost:33306/demo?charset=utf8")
+# print("mysql+aiomysql://root:test-passwd@localhost:33306/demo?charset=utf8")
