@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
-
-from api.config.config import DBConfig
+from api.config.mysql_config import DBConfig
 
 ASYNC_DB_URL = "mysql+aiomysql://" + DBConfig().__str__()
 
