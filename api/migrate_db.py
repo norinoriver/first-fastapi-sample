@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 
 from api.models.task import Base
+from api.models.user import Base
 from api.config.mysql_config import DBConfig
 
 DB_URL="mysql+pymysql://" + DBConfig().__str__()

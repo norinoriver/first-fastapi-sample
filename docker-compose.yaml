@@ -16,7 +16,7 @@ services:
   redis:
     image: redis:alpine
     ports:
-      - 26380:6380
+      - 26379:6379
     command: redis-server --appendonly yes --requirepass test-passwd
     volumes:
       - redis-data:/data
