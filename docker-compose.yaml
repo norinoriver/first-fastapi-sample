@@ -4,20 +4,20 @@ services:
     image: mysql:8.0
     platform: linux/x86_64  # If you use M1 Mac, settings this parameter
     environment:
-      MYSQL_ROOT_PASSWORD: 'test-passwd'
-      MYSQL_DATABASE: 'demo'  # 初期データベースとしてdemoを設定
-      TZ: 'Asia/Tokyo'  # タイムゾーンを日本時間に設定
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DBNAME}  # 初期データベースとしてdemoを設定
+      TZ: ${MYSQL_TZ}  # タイムゾーンを日本時間に設定
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql-settings/my.cnf:/etc/mysql/conf.d/my.cnf
     command: --default-authentication-plugin=mysql_native_password  # MySQL8.0ではデフォルトが"caching_sha2_password"で、ドライバが非対応のため変更
     ports:
-      - 33306:3306  # ホストマシンのポート33306を、docker内のポート3306に接続する
+      - ${MYSQL_LOCAL_PORT}:${MYSQL_DOCKER_PORT}  # ホストマシンのポート33306を、docker内のポート3306に接続する
   redis:
     image: redis:alpine
     ports:
-      - 26379:6379
-    command: redis-server --appendonly yes --requirepass test-passwd
+      - ${REDIS_LOCAL_PORT}:${REDIS_DOCKER_PORT}
+    command: redis-server --appendonly yes --requirepass ${REDIS_DEFAULT_PASSWORD}
     volumes:
       - redis-data:/data
     

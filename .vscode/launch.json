@@ -3,18 +3,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: local debug",
+            "name": "FastAPI: dev debug",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
-            "args": ["api.main:app", "--reload"],
+            "args": ["api.main:app", "--reload", "--env-file", "./.dockerenv/dev.env"],
             "justMyCode": false
-            // "program": "${file}",
-            // "console": "integratedTerminal",
-            // "justMyCode": true
         },
         {
-            "name": "Python: Current File",
+            "name": "Python: Current File debug",
             "type": "python",
             "request": "launch",
             "program": "${file}",

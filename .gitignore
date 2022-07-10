@@ -1,3 +1,4 @@
 # poetry installで取得できるので気にしない
 .venv
 *.pyc
+.dockerenv
