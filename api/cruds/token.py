@@ -23,9 +23,12 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 async def authenticate_user(form_data: OAuth2PasswordRequestForm, db: AsyncSession):
-    result: Result = await db.execute(select(user_model.User.email, user_model.User.hashed_password).filter(user_model.User.email == form_data.username))
+    result: Result = await db.execute(select(user_model.User.email, user_model.User.hashed_password, user_model.User.is_permitted).filter(user_model.User.email == form_data.username))
     user = result.all()[0]
     if not user:
+        return False
+
+    if not user.is_permitted:
         return False
 
     if not verify_password(form_data.password, user.hashed_password):
