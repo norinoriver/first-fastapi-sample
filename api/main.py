@@ -1,8 +1,3 @@
-from dotenv import load_dotenv
-import os
-dotenv_path="./.dockerenv/dev.env" # TODO: setting run xargs
-load_dotenv(dotenv_path=dotenv_path)
-
 from fastapi import FastAPI
 from api.routers import task, done, token, user
 
