@@ -117,3 +117,11 @@
 #     print("error")
 
 # print(len("$2b$12$A/kzt7aCdWKQFpwDCo7XC.DO9dGoz0ppPlFF69u9m4BGSBbYsZr3S"))
+
+# import fire
+# def greet(msg="HELLO WORLD!"):
+#     print(msg)
+
+# fire.Fire(greet)
+# import uuid
+# print(uuid.uuid4().hex)

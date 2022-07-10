@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+import uuid
+import urllib
 from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from sqlalchemy import select, func
@@ -19,13 +22,44 @@ async def create_user(db: AsyncSession, user_create: user_schemas.RequestCreateU
     hashed_password = SecurityConfig.pwd_ctx.hash(user_create.password)
     user_create_dict.pop("password")
     user_create_dict.update({"hashed_password": hashed_password})
+    user_create_dict.update({"permit_url": uuid.uuid4().hex})
+    datetime_now = datetime.now()
+    permit_deadline = datetime_now + timedelta(days=1)
+    user_create_dict.update({"permit_deadline": permit_deadline.__str__()})
 
     user = user_models.User(**user_create_dict)
     db.add(user)
+
     await db.commit()
     await db.refresh(user)
 
+    # TODO: move to config.
+    # TODO: change settings env
+    user.permit_url = user.permit_url = "http://localhost:8000/users/permit/" + urllib.parse.quote(user.permit_url) + "/"
     return user
+
+async def is_permitted_user(uuid, db: AsyncSession):
+    result: Result = await db.execute(
+        select(user_models.User)
+            .filter(user_models.User.permit_url == uuid)
+            .filter(user_models.User.permit_deadline >= datetime.now())
+            .filter(user_models.User.is_permitted == False)
+    )
+
+    not_permitted_user = result.first()
+
+    if not not_permitted_user:
+        return None
+
+    not_permitted_user: user_models.User = not_permitted_user[0]
+    return not_permitted_user
+
+async def update_permmit_user(user: user_schemas.ResponsePermitedUser, db: AsyncSession):
+    user.is_permitted = True
+    await db.commit()
+    await db.refresh(user)
+    return user
+
 
 async def get_current_user(token: str = Depends(SecurityConfig.oauth2_scheme), db: AsyncSession = Depends(get_db)):
     credentials_exception = HTTPException(

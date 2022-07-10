@@ -1,5 +1,8 @@
-from sqlalchemy import create_engine
+import sys
+import dotenv
+dotenv.load_dotenv(sys.argv[1]) # TODO: more cool code.
 
+from sqlalchemy import create_engine
 from api.models.task import Base
 from api.models.user import Base
 from api.config.mysql_config import DBConfig
