@@ -19,7 +19,7 @@ async def regist_new_user(user_body: user_schemas.RequestCreateUser, db: AsyncSe
     return user
 
 @router.put("/users/permit/{uuid}", response_model=user_schemas.ResponseUser)
-async def user_permit(uuid, db: AsyncSession = Depends(get_db)):
+async def user_permit(uuid: str, db: AsyncSession = Depends(get_db)):
     not_permit_user = await user_cruds.is_permitted_user(uuid, db)
     if not not_permit_user:
         raise HTTPException(
