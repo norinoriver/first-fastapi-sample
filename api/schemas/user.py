@@ -13,7 +13,6 @@ class ResponseUser(UserBase):
         orm_mode = True
 
 class ResponseCreatedUser(UserBase):
-    permit_url: AnyHttpUrl
     permit_deadline: datetime
 
     class Config:

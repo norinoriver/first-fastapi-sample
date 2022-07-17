@@ -7,9 +7,10 @@ class Task(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(1024))
-    userid = Column(Integer, ForeignKey("users.userid")) 
+    userid = Column(Integer, ForeignKey("users.userid"), nullable=False) 
 
     done = relationship("Done", back_populates="task")
+    
 
 class Done(Base):
     __tablename__ = "dones"
