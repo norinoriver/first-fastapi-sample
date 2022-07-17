@@ -1,41 +1,48 @@
+from fastapi import Depends
 from typing import Tuple, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.engine import Result
 from sqlalchemy import select 
+from api.config.security_config import SecurityConfig
 import api.models.task as task_model
-import api.schemas.task as task_schema
+import api.schemas.task as task_schemas
 
 async def create_task(
-    db: AsyncSession, task_create: task_schema.TaskCreate
+    db: AsyncSession, task_create: task_schemas.TaskCreate, userid: int
 ) -> task_model.Task:
-    task = task_model.Task(**task_create.dict())
+    task_create_dict = task_create.dict()
+    task_create_dict.update({"userid": userid})
+    task = task_model.Task(**task_create_dict)
     db.add(task)
     await db.commit()
     await db.refresh(task)
     return task
 
-async def get_tasks_with_done(db: AsyncSession) -> List[Tuple[int, str, bool]]:
+async def get_tasks_with_done(db: AsyncSession, userid: int) -> List[Tuple[int, str, bool]]:
     result: Result = await (
         db.execute(
             select(
                 task_model.Task.id,
                 task_model.Task.title,
                 task_model.Done.id.isnot(None).label("done"),
-            ).outerjoin(task_model.Done)
+            )
+            .outerjoin(task_model.Done)
+            .filter(task_model.Task.userid == userid)
         )
     )
 
     return result.all()
 
-async def get_task(db: AsyncSession, task_id: int) -> Optional[task_model.Task]:
+async def get_task(db: AsyncSession, task_id: int, userid: int) -> Optional[task_model.Task]:
     result: Result = await db.execute(
-        select(task_model.Task).filter(task_model.Task.id == task_id)
+        select(task_model.Task).filter(task_model.Task.id == task_id).filter(task_model.Task.userid == userid)
     )
     task: Optional[Tuple[task_model.Task]] = result.first()
     return task[0] if task is not None else None
 
-async def update_task(db: AsyncSession, task_create: task_schema.TaskCreate, original: task_model.Task) -> task_model.Task:
+async def update_task(db: AsyncSession, task_create: task_schemas.TaskCreate, original: task_model.Task, userid: int) -> task_model.Task:
     original.title = task_create.title
+    original.userid = userid
     db.add(original)
     await db.commit()
     await db.refresh(original)

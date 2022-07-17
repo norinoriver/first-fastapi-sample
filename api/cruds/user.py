@@ -1,23 +1,28 @@
 from datetime import datetime, timedelta
 import uuid
 import urllib
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from jose import JWTError, jwt
 from sqlalchemy import select, func
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.config.security_config import SecurityConfig
+from api.config.server_config import ServerConfig
 from api.db import get_db
 from api.models import user as user_models
 from api.schemas import user as user_schemas
+from api.exceptions.http_exception.user_exception import UserException
+
+async def is_registed_user(db: AsyncSession, target_user: user_schemas.RequestCreateUser):
+    result: Result = await db.execute(select(func.count(user_models.User.email)).filter(user_models.User.email == target_user.email))
+    result_list = result.all()
+    is_registed = result_list[0][0]
+    if is_registed == 0:
+        return False
+    else:
+        return True
 
 async def create_user(db: AsyncSession, user_create: user_schemas.RequestCreateUser) -> user_models.User:
-
-    result: Result = await db.execute(select(func.count(user_models.User.email)).filter(user_models.User.email == user_create.email))
-    is_registed = result.all()[0][0]
-    if is_registed != 0:
-        return None
-
     user_create_dict = user_create.dict()
     hashed_password = SecurityConfig.pwd_ctx.hash(user_create.password)
     user_create_dict.pop("password")
@@ -33,9 +38,7 @@ async def create_user(db: AsyncSession, user_create: user_schemas.RequestCreateU
     await db.commit()
     await db.refresh(user)
 
-    # TODO: move to config.
-    # TODO: change settings env
-    user.permit_url = user.permit_url = "http://localhost:8000/users/permit/" + urllib.parse.quote(user.permit_url) + "/"
+    user.permit_url = ServerConfig().__str__() + urllib.parse.quote(user.permit_url)
     return user
 
 async def is_permitted_user(uuid, db: AsyncSession):
@@ -62,27 +65,21 @@ async def update_permmit_user(user: user_schemas.ResponsePermitedUser, db: Async
 
 
 async def get_current_user(token: str = Depends(SecurityConfig.oauth2_scheme), db: AsyncSession = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"}
-    )
-    
     try:
         payload = jwt.decode(token, SecurityConfig.SECRET_KEY, algorithms=[SecurityConfig.ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise credentials_exception
+            raise UserException.COULD_NOT_VALIDATE_CREDENTIALS
     except JWTError:
-        raise credentials_exception
+        raise UserException.COULD_NOT_VALIDATE_CREDENTIALS
     
-    result: Result = await db.execute(select(user_models.User.email).filter(user_models.User.email == username))
+    result: Result = await db.execute(select(user_models.User.userid, user_models.User.email).filter(user_models.User.email == username))
     user = result.all()
     if user is None:
-        raise credentials_exception
+        raise UserException.COULD_NOT_VALIDATE_CREDENTIALS
     return user
 
 async def get_current_active_user(current_user: user_models.User = Depends(get_current_user)):
     if len(current_user) != 1:
-        raise HTTPException(status_code=400, deital="Inactive user")
-    return current_user
+        raise UserException.INACTIVE_USER
+    return current_user[0]

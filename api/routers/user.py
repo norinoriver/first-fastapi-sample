@@ -4,18 +4,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.db import get_db
 import api.cruds.user as user_cruds
 import api.schemas.user as user_schemas
+from api.exceptions.http_exception.user_exception import UserException
 
 router = APIRouter()
 
 @router.post("/", response_model=user_schemas.ResponseCreatedUser)
-async def regist_new_user(user_body: user_schemas.RequestCreateUser, db: AsyncSession = Depends(get_db)):
+async def create_new_user(user_body: user_schemas.RequestCreateUser, db: AsyncSession = Depends(get_db)):
+    if await user_cruds.is_registed_user(db, user_body):
+        raise UserException.CANNOT_USE_EMAIL
+        
     user = await user_cruds.create_user(db, user_body)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Can't use this email.",
-        )
-
+    
     return user
 
 @router.put("/users/permit/{uuid}", response_model=user_schemas.ResponseUser)
