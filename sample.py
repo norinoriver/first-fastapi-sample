@@ -125,3 +125,10 @@
 # fire.Fire(greet)
 # import uuid
 # print(uuid.uuid4().hex)
+
+# from  passlib.context import CryptContext
+
+# pwd_ctx = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
+# password = "password"
+# hashed_password = pwd_ctx.hash(password)
+# print(hashed_password)

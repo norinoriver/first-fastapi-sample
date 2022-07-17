@@ -2,3 +2,4 @@
 .venv
 *.pyc
 .dockerenv
+mysql_dumps
