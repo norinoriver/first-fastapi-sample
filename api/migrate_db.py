@@ -1,6 +1,9 @@
-import sys
-import dotenv
-dotenv.load_dotenv(sys.argv[1]) # TODO: more cool code.
+import sys, os, dotenv, argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-e", "--env", help="setting file path of environ", required=True)
+args = parser.parse_args()
+dotenv.load_dotenv(args.env)
 
 from sqlalchemy import create_engine
 from api.models.task import Base
