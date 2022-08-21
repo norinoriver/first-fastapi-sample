@@ -6,12 +6,16 @@ from sqlalchemy import select
 from api.config.security_config import SecurityConfig
 import api.models.task as task_model
 import api.schemas.task as task_schemas
+from datetime import datetime
 
 async def create_task(
     db: AsyncSession, task_create: task_schemas.TaskCreate, userid: int
 ) -> task_model.Task:
     task_create_dict = task_create.dict()
     task_create_dict.update({"userid": userid})
+    now = datetime.now() # In acturally, send datetime from frontend user.
+    task_create_dict.update({"start_time": now})
+    task_create_dict.update({"end_time"  : now})
     task = task_model.Task(**task_create_dict)
     db.add(task)
     await db.commit()
