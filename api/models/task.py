@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from api.db import Base
 
@@ -8,6 +8,8 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String(1024))
     userid = Column(Integer, ForeignKey("users.userid"), nullable=False) 
+    start_time = Column(DateTime, nullable=False)
+    end_time = Column(DateTime, nullable=False)
 
     done = relationship("Done", back_populates="task")
     
