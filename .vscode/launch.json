@@ -7,7 +7,7 @@
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
-            "args": ["api.main:app", "--reload", "--env-file", "./.dockerenv/dev.env"],
+            "args": ["api.main:app", "--reload", "--env-file", "./dockerfiles/.dockerenv/dev.env"],
             "justMyCode": false
         },
         {
